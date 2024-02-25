@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import html2pdf from "html2pdf.js";
 
 const App = () => {
@@ -15,6 +15,14 @@ const App = () => {
     { productName: "", quantity: 1, price: 0, totalPrice: 0 },
   ]);
   const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    // Dynamically import html2pdf library only on the client-side
+    import("html2pdf.js").then((module) => {
+      const html2pdf = module.default;
+      window.html2pdf = html2pdf; // Expose html2pdf to the global scope
+    });
+  }, []);
 
   const handleInputChange = (index, event) => {
     const { name, value } = event.target;
@@ -53,7 +61,7 @@ const App = () => {
     const element = document.getElementById("pdf-content");
 
     if (element) {
-      html2pdf().from(element).save(`${name}-bill.pdf`);
+      window.html2pdf().from(element).save(`${name}-bill.pdf`);
     } else {
       console.error("Element not found.");
     }
